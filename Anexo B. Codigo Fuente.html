@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SGBD Académico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #1B4332;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .sidebar {
+      background-color: #081C15;
+      color: white;
+      height: 100vh;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding-top: 4rem;
+    }
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 1rem;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      background-color: #2D6A4F;
+    }
+    .main {
+      margin-left: 250px;
+      padding: 6rem 2rem 2rem 2rem; 
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .hidden {
+      display: none;
+    }
+    .button {
+      background-color: #2D6A4F;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #40916C;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+    }
+    .close {
+      float: right;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content input[type="password"],
+.modal-content select,
+.modal-content textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.modal-content label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.modal-content button[type="submit"] {
+  align-self: center;
+  margin-top: 1rem;
+  background-color: #2D6A4F;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-content button[type="submit"]:hover {
+  background-color: #40916C;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+form label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="url"],
+form input[type="number"],
+form select,
+form textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+form textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+form button[type="submit"],
+form .button {
+  align-self: flex-start;
+  background-color: #2D6A4F;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+form button[type="submit"]:hover,
+form .button:hover {
+  background-color: #40916C;
+}
+
+  </style>
+</head>
+<body>
+  <header>
+    <h1> SGBD</h1>
+    <button class="button" onclick="document.getElementById('modalLogin').style.display='flex'">Iniciar Sesión</button>
+  </header>
+  <div class="sidebar">
+    <a href="#" onclick="showSection('usuarios')">Gestión de Usuarios</a>
+    <a href="#" onclick="showSection('esquemas')">Gestión de Esquemas</a>
+    <a href="#" onclick="showSection('sql')">Editor SQL</a>
+    <a href="#" onclick="showSection('transacciones')">Transacciones</a>
+    <a href="#" onclick="showSection('seguridad')">Seguridad</a>
+    <a href="#" onclick="showSection('carga')">Carga de Datos</a>
+    <a href="#" onclick="showSection('backup')">Backup & Restauración</a>
+    <a href="#" onclick="showSection('indices')">Optimización</a>
+    <a href="#" onclick="showSection('conectividad')">Conectividad</a>
+    <a href="#" onclick="showSection('visualizacion')">Visualización</a>
+    <a href="#" onclick="showSection('recursos')">Recursos Académicos</a>
+    <a href="#" onclick="showSection('api')">API REST</a>
+  </div>
+  <main class="main">
+    <div id="usuarios" class="card hidden">
+      <h2>Gestión de Usuarios</h2>
+      <button class="button" onclick="document.getElementById('modalUsuario').style.display='flex'">+ Nuevo Usuario</button>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Juan Pérez</td><td>juan@ucundinamarca.edu.co</td><td>Estudiante</td><td><button class="button">Editar</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="esquemas" class="card hidden">
+      <h2>Gestión de Esquemas</h2>
+      <button class="button" onclick="document.getElementById('modalEsquema').style.display='flex'">+ Nueva Tabla</button>
+      <table>
+        <thead>
+          <tr><th>Nombre Tabla</th><th>Claves</th><th>Restricciones</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Estudiantes</td><td>ID (PK)</td><td>NOT NULL</td><td><button class="button">Modificar</button></td></tr>
+          <tr><td>Materias</td><td>ID (PK)</td><td>NOT NULL</td><td><button class="button">Modificar</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="sql" class="card hidden">
+      <h2>Editor SQL</h2>
+      <label for="sql-editor">Escribe tu consulta:</label>
+      <textarea id="sql-editor" placeholder="SELECT * FROM estudiantes;"></textarea>
+      <button class="button" onclick="mostrarResultadosSQL()">Ejecutar</button>
+      <div id="sql-results">
+        <strong>Resultados:</strong>
+        <table>
+          <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Ana Torres</td><td>ana@ucundinamarca.edu.co</td></tr>
+            <tr><td>2</td><td>Carlos Ruiz</td><td>carlos@ucundinamarca.edu.co</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="transacciones" class="card hidden">
+      <h2>Transacciones</h2>
+      <div>
+        <button class="button" onclick="agregarTransaccion('BEGIN')">BEGIN</button>
+        <button class="button" onclick="agregarTransaccion('COMMIT')">COMMIT</button>
+        <button class="button" onclick="agregarTransaccion('ROLLBACK')">ROLLBACK</button>
+        <button class="button" onclick="alternarAutocommit()">AUTOCOMMIT</button>
+      </div>
+      <br>
+      <div id="historial-transacciones">
+        <strong>Historial de Transacciones:</strong>
+        <ul id="lista-transacciones" style="padding-left: 1.2rem;"></ul>
+      </div>
+    </div>
+
+    <div id="seguridad" class="card hidden">
+      <h2>Seguridad y Control de Acceso</h2>
+      <form>
+        <label for="usuarioAcceso">Usuario:</label>
+        <input type="text" id="usuarioAcceso" placeholder="usuario123">
+        <label for="rolSeguridad">Rol de seguridad:</label>
+        <select id="rolSeguridad">
+          <option>Estudiante</option>
+          <option>Docente</option>
+          <option>Administrador</option>
+        </select>
+        <label for="politicaPassword">Política de contraseña:</label>
+        <select id="politicaPassword">
+          <option>Requiere mayúsculas y números</option>
+          <option>Expira cada 90 días</option>
+          <option>Longitud mínima: 8 caracteres</option>
+        </select>
+        <label for="limiteRecursos">Límite de recursos (conexiones simultáneas):</label>
+        <input type="number" id="limiteRecursos" value="3">
+        <br><br>
+        <button class="button" type="submit">Guardar Políticas</button>
+      </form>
+      <br>
+      <h3>Estado de Cifrado</h3>
+      <ul>
+        <li><strong>En tránsito:</strong> SSL/TLS habilitado ✅</li>
+        <li><strong>En reposo:</strong> TDE activo ✅</li>
+        <li><strong>Columnas sensibles:</strong> AES_ENCRYPT aplicado ✅</li>
+      </ul>
+    </div>
+
+    <div id="carga" class="card hidden">
+      <h2>Carga de Datos</h2>
+      <form id="formCarga">
+        <label for="archivoCarga">Seleccionar archivo (.csv o .json):</label>
+        <input type="file" id="archivoCarga" accept=".csv, .json">
+        <br><br>
+        <button class="button" type="submit">Cargar Datos</button>
+      </form>
+      <div id="previewDatos">
+        <h3>Vista Previa:</h3>
+        <table>
+          <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th></tr></thead>
+          <tbody>
+            <tr><td>101</td><td>Laura Gómez</td><td>laura@ucundinamarca.edu.co</td></tr>
+            <tr><td>102</td><td>Marco Díaz</td><td>marco@ucundinamarca.edu.co</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <br>
+      <div>
+        <h3>Historial de Importaciones</h3>
+        <ul>
+          <li>datos_estudiantes.csv - 18/05/2025 10:30 AM ✅</li>
+          <li>registro_docentes.json - 17/05/2025 02:45 PM ✅</li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="backup" class="card hidden">
+      <h2>Backup y Restauración</h2>
+      <div>
+        <button class="button" onclick="agendarBackup()">Programar Backup</button>
+        <button class="button" onclick="descargarBackup()">Descargar Backup</button>
+        <button class="button" onclick="restaurarBackup()">Restaurar Último</button>
+      </div>
+      <br>
+      <table>
+        <thead><tr><th>Fecha</th><th>Nombre Archivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+          <tr><td>2025-05-18</td><td>backup_full_2025_05_18.sql</td><td>Exitoso</td><td><button class="button">Restaurar</button></td></tr>
+          <tr><td>2025-05-15</td><td>backup_parcial_2025_05_15.sql</td><td>Exitoso</td><td><button class="button">Restaurar</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="indices" class="card hidden">
+      <h2>Índices y Optimización</h2>
+      <form>
+        <label for="tablaIndice">Seleccionar Tabla:</label>
+        <select id="tablaIndice">
+          <option>Estudiantes</option>
+          <option>Materias</option>
+          <option>Notas</option>
+        </select>
+        <label for="columnaIndice">Columna a Indexar:</label>
+        <input type="text" id="columnaIndice" placeholder="nombre, correo, id_materia">
+        <br><br>
+        <button class="button" type="submit">Crear Índice</button>
+      </form>
+      <br>
+      <h3>Índices Existentes</h3>
+      <table>
+        <thead><tr><th>Tabla</th><th>Columna</th><th>Tipo</th><th>Acciones</th></tr></thead>
+        <tbody>
+          <tr><td>Estudiantes</td><td>correo</td><td>BTREE</td><td><button class="button">Eliminar</button></td></tr>
+          <tr><td>Materias</td><td>id_materia</td><td>HASH</td><td><button class="button">Eliminar</button></td></tr>
+        </tbody>
+      </table>
+      <br>
+      <h3>Plan de Ejecución</h3>
+      <p>Consulta: <code>SELECT * FROM estudiantes WHERE correo LIKE '%@gmail.com'</code></p>
+      <pre style="background:#f0f0f0;padding:1rem;border-radius:5px;">
+    EXPLAIN
+      -> Index scan using correo_idx on estudiantes
+         Filter: correo LIKE '%@gmail.com'
+         Rows examined: 25
+         Cost: 0.12
+      </pre>
+    </div>
+
+    <div id="conectividad" class="card hidden">
+      <h2>Conectividad Web</h2>
+      <form>
+        <label for="urlServidor">URL del Servidor Backend:</label>
+        <input type="url" id="urlServidor" placeholder="https://api.sgbdacademico.edu.co">
+        <label for="modoAcceso">Modo de Acceso:</label>
+        <select id="modoAcceso">
+          <option value="multiusuario">Multiusuario</option>
+          <option value="solo-lectura">Solo lectura</option>
+          <option value="mantenimiento">Modo mantenimiento</option>
+        </select>
+        <br><br>
+        <button class="button" type="submit">Guardar Conexión</button>
+      </form>
+      <br>
+      <h3>Formularios HTML Conectados</h3>
+<ul>
+  <li><button onclick="showSection('usuarios')">Gestión de Usuarios</button> ✅</li>
+  <li><button onclick="showSection('esquemas')">Gestión de Esquemas</button> ✅</li>
+  <li><button onclick="showSection('sql')">Editor SQL</button> ✅</li>
+</ul>
+
+    </div>
+
+    <div id="visualizacion" class="card hidden">
+      <h2>Visualización de Datos (Simulación)</h2>
+      <form onsubmit="generarGrafico(); return false;">
+        <label for="periodo1">Periodo Académico 1:</label>
+        <input type="text" id="periodo1" placeholder="Ej. 2024-2">
+        <label for="valor1">Cantidad:</label>
+        <input type="number" id="valor1" placeholder="Ej. 128">
+        <label for="periodo2">Periodo Académico 2:</label>
+        <input type="text" id="periodo2" placeholder="Ej. 2025-1">
+        <label for="valor2">Cantidad:</label>
+        <input type="number" id="valor2" placeholder="Ej. 145">
+        <br><br>
+        <button class="button" type="submit">Actualizar Gráfico</button>
+      </form>
+      <div style="margin-top:1rem">
+        <img id="graficoDinamico" src="" alt="Gráfico generado" style="width:100%;max-width:600px;display:none;">
+      </div>
+      <div style="margin-top:2rem;background:#f9f9f9;border-radius:8px;padding:1rem">
+        <h3>Gráfico Simulado</h3>
+        <img src="https://quickchart.io/chart?c={type:'bar',data:{labels:['2023-1','2023-2','2024-1'],datasets:[{label:'Estudiantes activos',data:[120,135,150]}]}}" alt="Gráfico simulado" style="width:100%;max-width:600px;">
+      </div>
+    </div>
+
+    <div id="recursos" class="card hidden">
+      <h2>Gestión de Recursos Académicos</h2>
+      <p>Administra estudiantes, docentes, materias, calificaciones y estructuras académicas personalizadas.</p>
+      <form onsubmit="agregarRecurso(); return false;">
+        <label for="tipo">Tipo de recurso:</label>
+        <select id="tipo">
+          <option>Estudiante</option>
+          <option>Docente</option>
+          <option>Materia</option>
+        </select>
+        <label for="nombreRecurso">Nombre:</label>
+        <input type="text" id="nombreRecurso" placeholder="Ej. Juan Pérez">
+        <label for="identificador">ID o Código:</label>
+        <input type="text" id="identificador" placeholder="Ej. 20251234">
+        <label for="estructura">Estructura adicional (opcional):</label>
+        <textarea id="estructura" placeholder="JSON o SQL personalizado"></textarea>
+        <br><br>
+        <button class="button" type="submit">Registrar Recurso</button>
+      </form>
+      <br>
+      <h3>Registros Ingresados</h3>
+      <table id="tablaRecursos">
+        <thead>
+          <tr><th>Tipo</th><th>Nombre</th><th>ID/Código</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="api" class="card hidden">
+      <h2>API y Conectividad Externa</h2>
+      <form onsubmit="return false;">
+        <label for="peticion">Probar Endpoint:</label>
+        <input type="text" id="peticion" placeholder="/api/usuarios">
+    
+        <label for="metodo">Método:</label>
+        <select id="metodo">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>DELETE</option>
+        </select>
+    
+        <label for="json">Cuerpo JSON (opcional):</label>
+        <textarea id="json" rows="4" placeholder='{"id":1,"nombre":"Juan"}'></textarea>
+    
+        <br><br>
+        <button class="button" onclick="probarApi()">Enviar</button>
+      </form>
+    
+      <div style="margin-top:1rem">
+        <strong>Respuesta simulada:</strong>
+        <pre style="background:#f0f0f0;padding:1rem;border-radius:5px;" id="resultadoApi">
+    {
+      "status": 200,
+      "mensaje": "Operación realizada con éxito",
+      "datos": {
+        "id": 1,
+        "nombre": "Juan",
+        "rol": "estudiante"
+      }
+    }</pre>
+      </div>
+    </div>
+  </main>
+
+  <div id="modalUsuario" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('modalUsuario').style.display='none'">&times;</span>
+      <h3>Nuevo Usuario</h3>
+      <form>
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" name="nombre" required>
+
+        <label for="email">Correo institucional:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="rol">Rol:</label>
+        <select id="rol" name="rol">
+          <option value="estudiante">Estudiante</option>
+          <option value="docente">Docente</option>
+          <option value="admin">Administrador</option>
+        </select>
+
+        <label for="clave">Contraseña temporal:</label>
+        <input type="password" id="clave" name="clave">
+
+        <br><br>
+        <button class="button" type="submit">Guardar Usuario</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modalEsquema" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('modalEsquema').style.display='none'">&times;</span>
+      <h3>Diseñar Nueva Tabla</h3>
+      <form>
+        <label for="nombreTabla">Nombre de la tabla:</label>
+        <input type="text" id="nombreTabla" name="nombreTabla" required>
+
+        <label for="columnas">Columnas (nombre tipo [restricciones]):</label>
+        <textarea id="columnas" name="columnas" rows="4" placeholder="id INT PRIMARY KEY, nombre VARCHAR(50) NOT NULL"></textarea>
+
+        <label for="claves">Claves primarias/foráneas:</label>
+        <input type="text" id="claves" name="claves" placeholder="id, materia_id">
+
+        <label for="restricciones">Restricciones de integridad:</label>
+        <select id="restricciones" name="restricciones">
+          <option value="not_null">NOT NULL</option>
+          <option value="unique">UNIQUE</option>
+          <option value="check">CHECK</option>
+          <option value="default">DEFAULT</option>
+        </select>
+
+        <br><br>
+        <button class="button" type="submit">Crear Tabla</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function mostrarResultadosSQL() {
+      document.getElementById('sql-results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function probarApi() {
+      const endpoint = document.getElementById('peticion').value;
+      const metodo = document.getElementById('metodo').value;
+      const datos = document.getElementById('json').value;
+      const salida = document.getElementById('resultadoApi');
+      salida.innerHTML = `<strong>Respuesta simulada:</strong><pre>{\n  "endpoint": "${endpoint}",\n  "método": "${metodo}",\n  "datos": ${datos || '{}'},\n  "status": 200,\n  "mensaje": "Operación realizada con éxito."\n}</pre>`;
+    }
+
+    function showSection(sectionId) {
+      // Ocultar todas las secciones
+      const sections = document.querySelectorAll('.card');
+      sections.forEach(section => {
+        section.classList.add('hidden');
+      });
+      // Mostrar la sección seleccionada
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+    let autocommit = false;
+
+function agregarTransaccion(tipo) {
+  const lista = document.getElementById("lista-transacciones");
+  const item = document.createElement("li");
+  const timestamp = new Date().toLocaleTimeString();
+  item.textContent = `${timestamp} - ${tipo}`;
+  lista.appendChild(item);
+}
+
+function alternarAutocommit() {
+  autocommit = !autocommit;
+  agregarTransaccion('AUTOCOMMIT ' + (autocommit ? 'ACTIVADO' : 'DESACTIVADO'));
+}
+
+  </script>
+  <div id="modalLogin" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('modalLogin').style.display='none'">&times;</span>
+      <h3>Iniciar Sesión</h3>
+      <form>
+        <label for="loginEmail">Correo institucional:</label>
+        <input type="email" id="loginEmail" name="loginEmail" placeholder="usuario@ucundinamarca.edu.co" required>
+  
+        <label for="loginPassword">Contraseña:</label>
+        <input type="password" id="loginPassword" name="loginPassword" required>
+  
+        <br>
+        <button class="button" type="submit">Entrar</button>
+      </form>
+    </div>
+  </div>
+  
+</body>
+</html>
